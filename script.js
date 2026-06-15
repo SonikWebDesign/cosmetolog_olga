@@ -1,550 +1,634 @@
 // ===============================
-// GOOGLE SHEETS PRICE LIST SETUP
+// GOOGLE SHEETS PRICE LIST
 // ===============================
-// 1) Направи Google Sheet с колони:
-// tab | tabLabel | category | name | description | price | visible
-// 2) File -> Share -> Publish to web -> CSV
-// 3) Постави CSV линка тук:
-const SHEET_CSV_URL = ''; // пример: 'https://docs.google.com/spreadsheets/d/e/.../pub?output=csv'
+// Sheet columns: category | subcategory | name | description | price
+// Client can safely edit only the `price` column.
+
+const SHEET_SOURCE_URL = "https://docs.google.com/spreadsheets/d/1oMszuFqlkky34DVsuRTQlfHncM7Qztrky6A-GbBuQGI/edit?gid=0#gid=0";
 
 const FALLBACK_SERVICES = [
   {
-    "tab": "cosmetology",
-    "tabLabel": "Косметология",
-    "category": "Очищение",
-    "name": "Ультразвуковая чистка лица",
+    "category": "Косметология",
+    "subcategory": "Консультации",
+    "name": "Обзорная консультация 60 минут",
     "description": "",
-    "price": "€40",
-    "visible": "yes"
+    "price": "35"
   },
   {
-    "tab": "cosmetology",
-    "tabLabel": "Косметология",
-    "category": "Очищение",
-    "name": "Комбинированная чистка лица",
+    "category": "Косметология",
+    "subcategory": "Чистки",
+    "name": "Чистка лица ультразвуковая",
     "description": "",
-    "price": "€45",
-    "visible": "yes"
+    "price": "40"
   },
   {
-    "tab": "cosmetology",
-    "tabLabel": "Косметология",
-    "category": "Очищение",
+    "category": "Косметология",
+    "subcategory": "Чистки",
+    "name": "Чистка лица комбинированная",
+    "description": "",
+    "price": "45"
+  },
+  {
+    "category": "Косметология",
+    "subcategory": "Чистки",
     "name": "Чистка спины",
     "description": "",
-    "price": "€55–60",
-    "visible": "yes"
+    "price": "55-60"
   },
   {
-    "tab": "cosmetology",
-    "tabLabel": "Косметология",
-    "category": "Увлажнение",
-    "name": "HydraFacial",
+    "category": "Косметология",
+    "subcategory": "Аппаратные процедуры",
+    "name": "Hydrafacial",
     "description": "",
-    "price": "€90",
-    "visible": "yes"
+    "price": "90"
   },
   {
-    "tab": "cosmetology",
-    "tabLabel": "Косметология",
-    "category": "Терапия",
-    "name": "Терапия периорбитальной зоны",
+    "category": "Косметология",
+    "subcategory": "Аппаратные процедуры",
+    "name": "Терапия переорбитальной зоны",
     "description": "",
-    "price": "€40",
-    "visible": "yes"
+    "price": "40"
   },
   {
-    "tab": "cosmetology",
-    "tabLabel": "Косметология",
-    "category": "Лифтинг",
+    "category": "Косметология",
+    "subcategory": "RF лифтинг",
     "name": "RF лифтинг лица",
     "description": "",
-    "price": "€40",
-    "visible": "yes"
+    "price": "40"
   },
   {
-    "tab": "cosmetology",
-    "tabLabel": "Косметология",
-    "category": "Лифтинг",
+    "category": "Косметология",
+    "subcategory": "RF лифтинг",
     "name": "RF лифтинг шея + декольте",
     "description": "",
-    "price": "€40",
-    "visible": "yes"
+    "price": "40"
   },
   {
-    "tab": "cosmetology",
-    "tabLabel": "Косметология",
-    "category": "Лифтинг",
+    "category": "Косметология",
+    "subcategory": "RF лифтинг",
     "name": "RF лифтинг глаза",
     "description": "",
-    "price": "€25",
-    "visible": "yes"
+    "price": "25"
   },
   {
-    "tab": "cosmetology",
-    "tabLabel": "Косметология",
-    "category": "Стимуляция",
-    "name": "Микротоковая терапия лица (30 мин)",
-    "description": "",
-    "price": "€25",
-    "visible": "yes"
+    "category": "Косметология",
+    "subcategory": "Микротоки",
+    "name": "Микротоковая терапия лица",
+    "description": "Миостимуляция лица (30 минут)",
+    "price": "25"
   },
   {
-    "tab": "cosmetology",
-    "tabLabel": "Косметология",
-    "category": "Стимуляция",
-    "name": "Микротоковая + шея и декольте (45 мин)",
-    "description": "",
-    "price": "€35",
-    "visible": "yes"
+    "category": "Косметология",
+    "subcategory": "Микротоки",
+    "name": "Микротоковая терапия шея и декольте",
+    "description": "Дополнительно, 45 минут",
+    "price": "35"
   },
   {
-    "tab": "cosmetology",
-    "tabLabel": "Косметология",
-    "category": "Мезотерапия",
-    "name": "Карбокситерапия (Pelart Laboratory)",
-    "description": "",
-    "price": "€60",
-    "visible": "yes"
+    "category": "Косметология",
+    "subcategory": "Аппаратные процедуры",
+    "name": "Карбокситерапия",
+    "description": "Pelart Laboratory",
+    "price": "60"
   },
   {
-    "tab": "cosmetology",
-    "tabLabel": "Косметология",
-    "category": "Мезотерапия",
-    "name": "Безынъекционная мезотерапия — лицо",
-    "description": "",
-    "price": "€55",
-    "visible": "yes"
+    "category": "Косметология",
+    "subcategory": "Безинъекционная мезотерапия",
+    "name": "Лицо полностью",
+    "description": "Фонофорез",
+    "price": "55"
   },
   {
-    "tab": "cosmetology",
-    "tabLabel": "Косметология",
-    "category": "Кислород",
-    "name": "Кислородная терапия (30 мин)",
-    "description": "",
-    "price": "€35",
-    "visible": "yes"
+    "category": "Косметология",
+    "subcategory": "Безинъекционная мезотерапия",
+    "name": "Глаза",
+    "description": "Фонофорез",
+    "price": "30"
   },
   {
-    "tab": "cosmetology",
-    "tabLabel": "Косметология",
-    "category": "Массаж",
+    "category": "Косметология",
+    "subcategory": "Кислородная терапия",
+    "name": "Полная процедура с ампулой",
+    "description": "30 минут",
+    "price": "35"
+  },
+  {
+    "category": "Косметология",
+    "subcategory": "Кислородная терапия",
+    "name": "Дополнительно к основной процедуре",
+    "description": "15 минут",
+    "price": "10"
+  },
+  {
+    "category": "Косметология",
+    "subcategory": "Массаж",
     "name": "БМС массаж",
     "description": "",
-    "price": "€45",
-    "visible": "yes"
+    "price": "45"
   },
   {
-    "tab": "microneedling",
-    "tabLabel": "Микронидлинг",
-    "category": "Базовый",
-    "name": "Микронидлинг с ампулой — лицо",
+    "category": "Профессиональный уход",
+    "subcategory": "Dr. Spiller + фонофорез + LED терапия",
+    "name": "Max. гидратация и лифтинг",
+    "description": "Немецкая косметика dr. Spiller + фонофорез + LED терапия",
+    "price": "45"
+  },
+  {
+    "category": "Профессиональный уход",
+    "subcategory": "Dr. Spiller + фонофорез + LED терапия",
+    "name": "Жирная кожа и акне",
+    "description": "Немецкая косметика dr. Spiller + фонофорез + LED терапия",
+    "price": "45"
+  },
+  {
+    "category": "Профессиональный уход",
+    "subcategory": "Dr. Spiller + фонофорез + LED терапия",
+    "name": "Осветление и пигментированная кожа",
+    "description": "Немецкая косметика dr. Spiller + фонофорез + LED терапия",
+    "price": "50"
+  },
+  {
+    "category": "Профессиональный уход",
+    "subcategory": "Dr. Spiller + фонофорез + LED терапия",
+    "name": "Розацеа, дерматит, чувствительная кожа",
+    "description": "Немецкая косметика dr. Spiller + фонофорез + LED терапия",
+    "price": "40"
+  },
+  {
+    "category": "Профессиональный уход",
+    "subcategory": "Dr. Spiller + фонофорез + LED терапия",
+    "name": "Восстановление поврежденной кожи, питание",
+    "description": "Немецкая косметика dr. Spiller + фонофорез + LED терапия",
+    "price": "50"
+  },
+  {
+    "category": "Профессиональный уход",
+    "subcategory": "Dr. Spiller + фонофорез + LED терапия",
+    "name": "Лифтинг",
+    "description": "Немецкая косметика dr. Spiller + фонофорез + LED терапия",
+    "price": "45"
+  },
+  {
+    "category": "Аппаратные процедуры для тела",
+    "subcategory": "Разовые процедуры",
+    "name": "RF лифтинг",
+    "description": "1 зона / 30 минут",
+    "price": "30"
+  },
+  {
+    "category": "Аппаратные процедуры для тела",
+    "subcategory": "Разовые процедуры",
+    "name": "Горячий вакуумный массаж",
+    "description": "1 зона / 20 минут",
+    "price": "25"
+  },
+  {
+    "category": "Аппаратные процедуры для тела",
+    "subcategory": "Разовые процедуры",
+    "name": "Липолазер / лазерная липосакция",
+    "description": "30 минут",
+    "price": "15"
+  },
+  {
+    "category": "Аппаратные процедуры для тела",
+    "subcategory": "Разовые процедуры",
+    "name": "Кавитация / ультразвуковая липосакция",
+    "description": "1 зона / 30 минут",
+    "price": "20"
+  },
+  {
+    "category": "Аппаратные процедуры для тела",
+    "subcategory": "Разовые процедуры",
+    "name": "Миостимуляция мышц тела",
+    "description": "30 минут",
+    "price": "20"
+  },
+  {
+    "category": "Аппаратные процедуры для тела",
+    "subcategory": "Курс со скидкой -10%",
+    "name": "RF лифтинг",
+    "description": "7 процедур",
+    "price": "190"
+  },
+  {
+    "category": "Аппаратные процедуры для тела",
+    "subcategory": "Курс со скидкой -10%",
+    "name": "Горячий вакуумный массаж",
+    "description": "10 процедур",
+    "price": "200"
+  },
+  {
+    "category": "Аппаратные процедуры для тела",
+    "subcategory": "Курс со скидкой -10%",
+    "name": "Липолазер / лазерная липосакция",
+    "description": "10 процедур",
+    "price": "135"
+  },
+  {
+    "category": "Аппаратные процедуры для тела",
+    "subcategory": "Курс со скидкой -10%",
+    "name": "Кавитация / ультразвуковая липосакция",
+    "description": "10 процедур",
+    "price": "180"
+  },
+  {
+    "category": "Аппаратные процедуры для тела",
+    "subcategory": "Курс со скидкой -10%",
+    "name": "Миостимуляция мышц тела",
+    "description": "15 процедур",
+    "price": "300"
+  },
+  {
+    "category": "Фотоэпиляция",
+    "subcategory": "Ноги",
+    "name": "До колена",
     "description": "",
-    "price": "€55",
-    "visible": "yes"
+    "price": "35"
   },
   {
-    "tab": "microneedling",
-    "tabLabel": "Микронидлинг",
-    "category": "Базовый",
-    "name": "С ампулой шея + декольте",
+    "category": "Фотоэпиляция",
+    "subcategory": "Ноги",
+    "name": "Полностью",
     "description": "",
-    "price": "€80",
-    "visible": "yes"
+    "price": "60"
   },
   {
-    "tab": "microneedling",
-    "tabLabel": "Микронидлинг",
-    "category": "Тело",
-    "name": "Тело (1 зона) с гиалуроновой кислотой",
+    "category": "Фотоэпиляция",
+    "subcategory": "Бикини",
+    "name": "Внешнее",
     "description": "",
-    "price": "€80",
-    "visible": "yes"
+    "price": "20"
   },
   {
-    "tab": "microneedling",
-    "tabLabel": "Микронидлинг",
-    "category": "Руки",
-    "name": "Кисти рук с гиалур. кислотой",
+    "category": "Фотоэпиляция",
+    "subcategory": "Бикини",
+    "name": "Глубокое",
     "description": "",
-    "price": "€40",
-    "visible": "yes"
+    "price": "45"
   },
   {
-    "tab": "microneedling",
-    "tabLabel": "Микронидлинг",
-    "category": "Губы",
-    "name": "Микронидлинг для губ (Perfect Rose Lips)",
-    "description": "",
-    "price": "€45",
-    "visible": "yes"
-  },
-  {
-    "tab": "microneedling",
-    "tabLabel": "Микронидлинг",
-    "category": "Специальный",
-    "name": "С ботулоэффектом",
-    "description": "",
-    "price": "€60",
-    "visible": "yes"
-  },
-  {
-    "tab": "microneedling",
-    "tabLabel": "Микронидлинг",
-    "category": "Экзосомы",
-    "name": "С EXOSOME лицо/шея/декольте",
-    "description": "",
-    "price": "€160",
-    "visible": "yes"
-  },
-  {
-    "tab": "microneedling",
-    "tabLabel": "Микронидлинг",
-    "category": "Гормоны",
-    "name": "С фитоэстрогенами (менопауза)",
-    "description": "",
-    "price": "€60",
-    "visible": "yes"
-  },
-  {
-    "tab": "microneedling",
-    "tabLabel": "Микронидлинг",
-    "category": "Объём",
-    "name": "С VOLUFILIN (эффект липофилинга)",
-    "description": "",
-    "price": "€110",
-    "visible": "yes"
-  },
-  {
-    "tab": "microneedling",
-    "tabLabel": "Микронидлинг",
-    "category": "Регенерация",
-    "name": "С PDRN / полинуклеотиды",
-    "description": "",
-    "price": "€65",
-    "visible": "yes"
-  },
-  {
-    "tab": "microneedling",
-    "tabLabel": "Микронидлинг",
-    "category": "Алопеция",
-    "name": "Микронидлинг при алопеции — с сывороткой",
-    "description": "",
-    "price": "€60",
-    "visible": "yes"
-  },
-  {
-    "tab": "microneedling",
-    "tabLabel": "Микронидлинг",
-    "category": "Алопеция",
-    "name": "Микронидлинг при алопеции — с экзосомами",
-    "description": "",
-    "price": "€160",
-    "visible": "yes"
-  },
-  {
-    "tab": "peelings",
-    "tabLabel": "Пилинги",
-    "category": "PRX-T33",
-    "name": "PRX-T33 лицо",
-    "description": "",
-    "price": "€55",
-    "visible": "yes"
-  },
-  {
-    "tab": "peelings",
-    "tabLabel": "Пилинги",
-    "category": "PRX-T33",
-    "name": "PRX-T33 лицо + шея",
-    "description": "",
-    "price": "€75",
-    "visible": "yes"
-  },
-  {
-    "tab": "peelings",
-    "tabLabel": "Пилинги",
-    "category": "BioRePeel",
-    "name": "BioRePeel лицо",
-    "description": "",
-    "price": "€55",
-    "visible": "yes"
-  },
-  {
-    "tab": "peelings",
-    "tabLabel": "Пилинги",
-    "category": "BioRePeel",
-    "name": "BioRePeel лицо + шея + декольте",
-    "description": "",
-    "price": "€75",
-    "visible": "yes"
-  },
-  {
-    "tab": "peelings",
-    "tabLabel": "Пилинги",
-    "category": "BioRePeel",
-    "name": "BioRePeel тело (1 зона)",
-    "description": "",
-    "price": "€60",
-    "visible": "yes"
-  },
-  {
-    "tab": "peelings",
-    "tabLabel": "Пилинги",
-    "category": "BioRePeel",
-    "name": "BioRePeel колени, локти",
-    "description": "",
-    "price": "€45",
-    "visible": "yes"
-  },
-  {
-    "tab": "peelings",
-    "tabLabel": "Пилинги",
-    "category": "Карбоновый",
-    "name": "Карбоновый пилинг лицо",
-    "description": "",
-    "price": "€45",
-    "visible": "yes"
-  },
-  {
-    "tab": "peelings",
-    "tabLabel": "Пилинги",
-    "category": "Карбоновый",
-    "name": "Карбоновый лицо + шея + декольте",
-    "description": "",
-    "price": "€85",
-    "visible": "yes"
-  },
-  {
-    "tab": "peelings",
-    "tabLabel": "Пилинги",
-    "category": "Комбо",
-    "name": "Дермапен + BioRePeel (лечение постакне)",
-    "description": "Лицо",
-    "price": "€105",
-    "visible": "yes"
-  },
-  {
-    "tab": "epilation",
-    "tabLabel": "Фотоэпиляция",
-    "category": "Ноги",
-    "name": "Фотоэпиляция ноги до колена",
-    "description": "",
-    "price": "€35",
-    "visible": "yes"
-  },
-  {
-    "tab": "epilation",
-    "tabLabel": "Фотоэпиляция",
-    "category": "Ноги",
-    "name": "Фотоэпиляция ноги полностью",
-    "description": "",
-    "price": "€60",
-    "visible": "yes"
-  },
-  {
-    "tab": "epilation",
-    "tabLabel": "Фотоэпиляция",
-    "category": "Бикини",
-    "name": "Бикини внешнее",
-    "description": "",
-    "price": "€20",
-    "visible": "yes"
-  },
-  {
-    "tab": "epilation",
-    "tabLabel": "Фотоэпиляция",
-    "category": "Бикини",
-    "name": "Бикини глубокое",
-    "description": "",
-    "price": "€45",
-    "visible": "yes"
-  },
-  {
-    "tab": "epilation",
-    "tabLabel": "Фотоэпиляция",
-    "category": "Тело",
+    "category": "Фотоэпиляция",
+    "subcategory": "Подмышки",
     "name": "Подмышки",
     "description": "",
-    "price": "€20",
-    "visible": "yes"
+    "price": "20"
   },
   {
-    "tab": "epilation",
-    "tabLabel": "Фотоэпиляция",
-    "category": "Руки",
-    "name": "Руки до локтя",
+    "category": "Фотоэпиляция",
+    "subcategory": "Руки",
+    "name": "До локтя",
     "description": "",
-    "price": "€25",
-    "visible": "yes"
+    "price": "25"
   },
   {
-    "tab": "epilation",
-    "tabLabel": "Фотоэпиляция",
-    "category": "Лицо",
-    "name": "Лицо полностью",
+    "category": "Фотоэпиляция",
+    "subcategory": "Руки",
+    "name": "Полностью",
     "description": "",
-    "price": "€25",
-    "visible": "yes"
+    "price": "50"
   },
   {
-    "tab": "epilation",
-    "tabLabel": "Фотоэпиляция",
-    "category": "IPL",
-    "name": "Фотоомоложение лицо (IPL)",
+    "category": "Фотоэпиляция",
+    "subcategory": "Лицо",
+    "name": "Полностью",
     "description": "",
-    "price": "€30",
-    "visible": "yes"
+    "price": "25"
   },
   {
-    "tab": "epilation",
-    "tabLabel": "Фотоэпиляция",
-    "category": "IPL",
-    "name": "IPL лечение акне — лицо",
+    "category": "Фотоэпиляция",
+    "subcategory": "Лицо",
+    "name": "Зона до 5 см",
     "description": "",
-    "price": "€30",
-    "visible": "yes"
+    "price": "10"
   },
   {
-    "tab": "epilation",
-    "tabLabel": "Фотоэпиляция",
-    "category": "IPL",
-    "name": "IPL лечение розацеа — лицо",
+    "category": "Фотоэпиляция",
+    "subcategory": "Спина",
+    "name": "Спина",
     "description": "",
-    "price": "€30",
-    "visible": "yes"
+    "price": "75-85"
   },
   {
-    "tab": "body",
-    "tabLabel": "Тело",
-    "category": "RF",
-    "name": "RF лифтинг (1 зона / 30 мин)",
+    "category": "Фотоэпиляция",
+    "subcategory": "Зона на теле",
+    "name": "Зона на теле ~ 20×20",
     "description": "",
-    "price": "€30",
-    "visible": "yes"
+    "price": "20"
   },
   {
-    "tab": "body",
-    "tabLabel": "Тело",
-    "category": "Массаж",
-    "name": "Горячий вакуумный массаж (1 зона / 20 мин)",
+    "category": "IPL терапия",
+    "subcategory": "Фотоомоложение",
+    "name": "Лицо",
     "description": "",
-    "price": "€25",
-    "visible": "yes"
+    "price": "30"
   },
   {
-    "tab": "body",
-    "tabLabel": "Тело",
-    "category": "Липосакция",
-    "name": "Липолазер / лазерная липосакция (30 мин)",
+    "category": "IPL терапия",
+    "subcategory": "Фотоомоложение",
+    "name": "Участок на теле",
+    "description": "20 см²",
+    "price": "25"
+  },
+  {
+    "category": "IPL терапия",
+    "subcategory": "Лечение акне",
+    "name": "Лицо",
     "description": "",
-    "price": "€15",
-    "visible": "yes"
+    "price": "30"
   },
   {
-    "tab": "body",
-    "tabLabel": "Тело",
-    "category": "Кавитация",
-    "name": "Кавитация / ультразвуковая (1 зона / 30 мин)",
+    "category": "IPL терапия",
+    "subcategory": "Лечение акне",
+    "name": "Участок на теле",
+    "description": "20 см²",
+    "price": "25"
+  },
+  {
+    "category": "IPL терапия",
+    "subcategory": "Лечение розацеа",
+    "name": "Лицо",
     "description": "",
-    "price": "€20",
-    "visible": "yes"
+    "price": "30"
   },
   {
-    "tab": "body",
-    "tabLabel": "Тело",
-    "category": "Курс RF",
-    "name": "RF лифтинг — 7 процедур",
-    "description": "Скидка 10% при покупке курса",
-    "price": "€190",
-    "visible": "yes"
+    "category": "IPL терапия",
+    "subcategory": "Лечение розацеа",
+    "name": "Участок на теле",
+    "description": "20 см²",
+    "price": "25"
   },
   {
-    "tab": "body",
-    "tabLabel": "Тело",
-    "category": "Курс Массаж",
-    "name": "Горячий вакуумный массаж — 10 процедур",
+    "category": "Неинъекционная коррекция объема филлеров",
+    "subcategory": "Снятие гиалуроновых отеков",
+    "name": "Губы",
+    "description": "4 процедуры, стоимость указана за полный курс",
+    "price": "240"
+  },
+  {
+    "category": "Неинъекционная коррекция объема филлеров",
+    "subcategory": "Снятие гиалуроновых отеков",
+    "name": "Нижняя треть",
+    "description": "3 процедуры, стоимость указана за полный курс",
+    "price": "350"
+  },
+  {
+    "category": "Неинъекционная коррекция объема филлеров",
+    "subcategory": "Снятие гиалуроновых отеков",
+    "name": "Отдельная область на лице",
+    "description": "4 процедуры, стоимость указана за полный курс",
+    "price": "320"
+  },
+  {
+    "category": "Пилинги",
+    "subcategory": "PRX-T33",
+    "name": "Лицо",
     "description": "",
-    "price": "€200",
-    "visible": "yes"
+    "price": "55"
   },
   {
-    "tab": "lux",
-    "tabLabel": "LUX процедуры",
-    "category": "EMS+RF MESO",
-    "name": "4D booster (Elastin, Collagen, HA, Q10)",
-    "description": "Глубинная безыгольная мезотерапия + RF лифтинг",
-    "price": "€90",
-    "visible": "yes"
+    "category": "Пилинги",
+    "subcategory": "PRX-T33",
+    "name": "Лицо + шея",
+    "description": "",
+    "price": "75"
   },
   {
-    "tab": "lux",
-    "tabLabel": "LUX процедуры",
-    "category": "EMS+RF MESO",
+    "category": "Пилинги",
+    "subcategory": "BioRePeel",
+    "name": "Лицо",
+    "description": "",
+    "price": "55"
+  },
+  {
+    "category": "Пилинги",
+    "subcategory": "BioRePeel",
+    "name": "Лицо + шея + декольте",
+    "description": "",
+    "price": "75"
+  },
+  {
+    "category": "Пилинги",
+    "subcategory": "BioRePeel",
+    "name": "Тело",
+    "description": "1 зона",
+    "price": "60"
+  },
+  {
+    "category": "Пилинги",
+    "subcategory": "BioRePeel",
+    "name": "Колени, локти",
+    "description": "",
+    "price": "45"
+  },
+  {
+    "category": "Пилинги",
+    "subcategory": "Карбоновый пилинг",
+    "name": "Лицо",
+    "description": "",
+    "price": "45"
+  },
+  {
+    "category": "Пилинги",
+    "subcategory": "Карбоновый пилинг",
+    "name": "Лицо + шея",
+    "description": "",
+    "price": "70"
+  },
+  {
+    "category": "Пилинги",
+    "subcategory": "Карбоновый пилинг",
+    "name": "Лицо + шея + декольте",
+    "description": "",
+    "price": "85"
+  },
+  {
+    "category": "Пилинги",
+    "subcategory": "Дермапен + BioRePeel",
+    "name": "Лицо",
+    "description": "Лечение пост акне",
+    "price": "105"
+  },
+  {
+    "category": "Процедуры класса LUX",
+    "subcategory": "EMS + RF MESO",
+    "name": "4D booster",
+    "description": "Elastin, collagen, Hialuronic, Q10",
+    "price": "90"
+  },
+  {
+    "category": "Процедуры класса LUX",
+    "subcategory": "EMS + RF MESO",
     "name": "Регенерация 35+, 45+, 50+",
     "description": "",
-    "price": "€90",
-    "visible": "yes"
+    "price": "90"
   },
   {
-    "tab": "lux",
-    "tabLabel": "LUX процедуры",
-    "category": "EMS+RF MESO",
+    "category": "Процедуры класса LUX",
+    "subcategory": "EMS + RF MESO",
     "name": "Лечение розацеа, дерматита, чувствительной кожи",
     "description": "",
-    "price": "€80",
-    "visible": "yes"
+    "price": "80"
   },
   {
-    "tab": "lux",
-    "tabLabel": "LUX процедуры",
-    "category": "EMS+RF MESO",
+    "category": "Процедуры класса LUX",
+    "subcategory": "EMS + RF MESO",
     "name": "Лечение акне",
     "description": "",
-    "price": "€85",
-    "visible": "yes"
+    "price": "85"
   },
   {
-    "tab": "lux",
-    "tabLabel": "LUX процедуры",
-    "category": "SQT Bio",
+    "category": "Процедуры класса LUX",
+    "subcategory": "EMS + RF MESO",
+    "name": "Лечение купероза",
+    "description": "",
+    "price": "85"
+  },
+  {
+    "category": "Процедуры класса LUX",
+    "subcategory": "EMS + RF MESO",
+    "name": "Отбеливание, лечение пигментации",
+    "description": "",
+    "price": "90"
+  },
+  {
+    "category": "Процедуры класса LUX",
+    "subcategory": "EMS + RF MESO",
+    "name": "В период менопаузы",
+    "description": "Состав с растительными эстрогенами",
+    "price": "90"
+  },
+  {
+    "category": "Процедуры класса LUX",
+    "subcategory": "SQT",
     "name": "Revitalizing Beauty Therapy",
     "description": "Обновление и биоревитализация кожи",
-    "price": "€90",
-    "visible": "yes"
+    "price": "90"
   },
   {
-    "tab": "lux",
-    "tabLabel": "LUX процедуры",
-    "category": "SQT Bio",
+    "category": "Процедуры класса LUX",
+    "subcategory": "SQT",
+    "name": "Resurface Repair Set",
+    "description": "Лечение постакне, расширенные поры",
+    "price": "85"
+  },
+  {
+    "category": "Процедуры класса LUX",
+    "subcategory": "SQT",
     "name": "Anti-Aging REJUVENATION",
-    "description": "Омоложение, борьба с морщинами и тургором",
-    "price": "€120",
-    "visible": "yes"
+    "description": "Омоложение, борьба с морщинами и тургор",
+    "price": "120"
   },
   {
-    "tab": "lux",
-    "tabLabel": "LUX процедуры",
-    "category": "Экзосомы",
-    "name": "EXOSOMES лицо, шея, декольте",
-    "description": "Неинвазивно при помощи микронидлинга",
-    "price": "€160",
-    "visible": "yes"
+    "category": "Процедуры класса LUX",
+    "subcategory": "SQT",
+    "name": "NOURISHING HYDRATING SET",
+    "description": "Полная регенерация и увлажнение",
+    "price": "95"
   },
   {
-    "tab": "lux",
-    "tabLabel": "LUX процедуры",
-    "category": "Филлеры",
-    "name": "Коррекция объёма филлеров — губы (4 процедуры)",
-    "description": "Снятие гиалуроновых отёков",
-    "price": "€240",
-    "visible": "yes"
+    "category": "Процедуры класса LUX",
+    "subcategory": "EXOSOMES",
+    "name": "Лицо, шея, декольте",
+    "description": "Вводятся в кожу неинвазивно при помощи микронидлинга",
+    "price": "160"
+  },
+  {
+    "category": "Микронидлинг",
+    "subcategory": "Микронидлинг с ампулой",
+    "name": "Лицо",
+    "description": "",
+    "price": "55"
+  },
+  {
+    "category": "Микронидлинг",
+    "subcategory": "Микронидлинг с ампулой",
+    "name": "Шея + декольте",
+    "description": "С ампулой",
+    "price": "80"
+  },
+  {
+    "category": "Микронидлинг",
+    "subcategory": "Микронидлинг с ампулой",
+    "name": "Тело",
+    "description": "1 зона, с гиалуроновой кислотой",
+    "price": "80"
+  },
+  {
+    "category": "Микронидлинг",
+    "subcategory": "Микронидлинг с ампулой",
+    "name": "Кисти рук",
+    "description": "С гиалуроновой кислотой",
+    "price": "40"
+  },
+  {
+    "category": "Микронидлинг",
+    "subcategory": "Микронидлинг для губ",
+    "name": "Для губ",
+    "description": "Perfect rose lips",
+    "price": "45"
+  },
+  {
+    "category": "Микронидлинг",
+    "subcategory": "Активные сыворотки",
+    "name": "С ботулиноэффектом",
+    "description": "",
+    "price": "60"
+  },
+  {
+    "category": "Микронидлинг",
+    "subcategory": "Активные сыворотки",
+    "name": "С EXOSOME",
+    "description": "Лицо / лицо, шея, декольте",
+    "price": "160"
+  },
+  {
+    "category": "Микронидлинг",
+    "subcategory": "Активные сыворотки",
+    "name": "С фитоэстрогеном",
+    "description": "Менопауза, гормональный сбой",
+    "price": "60"
+  },
+  {
+    "category": "Микронидлинг",
+    "subcategory": "Активные сыворотки",
+    "name": "С VOLUFILIN",
+    "description": "Эффект липофилинга",
+    "price": "110"
+  },
+  {
+    "category": "Микронидлинг",
+    "subcategory": "Активные сыворотки",
+    "name": "С PDRN / поленуклиотиды",
+    "description": "",
+    "price": "65"
+  },
+  {
+    "category": "Микронидлинг",
+    "subcategory": "При алопеции",
+    "name": "С сывороткой",
+    "description": "",
+    "price": "60"
+  },
+  {
+    "category": "Микронидлинг",
+    "subcategory": "При алопеции",
+    "name": "С экзосомами",
+    "description": "",
+    "price": "160"
+  },
+  {
+    "category": "Микронидлинг",
+    "subcategory": "Дополнительно",
+    "name": "Проведение процедуры Дермопэн с электропорацией",
+    "description": "",
+    "price": "+25"
   }
 ];
 
-// Nav scroll
+// Navigation scroll effect
 const nav = document.getElementById('mainNav');
 window.addEventListener('scroll', () => {
-  nav.classList.toggle('scrolled', window.scrollY > 60);
+  if (nav) nav.classList.toggle('scrolled', window.scrollY > 60);
 });
 
 // Hero photo zoom on load
@@ -556,74 +640,82 @@ window.addEventListener('load', () => {
 // Scroll reveal
 const reveals = document.querySelectorAll('.reveal');
 const obs = new IntersectionObserver((entries) => {
-  entries.forEach((e, i) => {
-    if (e.isIntersecting) {
-      setTimeout(() => e.target.classList.add('visible'), i * 80);
-      obs.unobserve(e.target);
+  entries.forEach((entry, index) => {
+    if (entry.isIntersecting) {
+      setTimeout(() => entry.target.classList.add('visible'), index * 80);
+      obs.unobserve(entry.target);
     }
   });
 }, { threshold: 0.08 });
 reveals.forEach(el => obs.observe(el));
 
-function normalizeRow(row) {
-  return {
-    tab: (row.tab || row.Tab || row.categoryTab || '').trim() || 'services',
-    tabLabel: (row.tabLabel || row['tab label'] || row.TabLabel || row['Раздел'] || '').trim(),
-    category: (row.category || row.Category || row['Категория'] || '').trim(),
-    name: (row.name || row.Name || row['Услуга'] || row.service || '').trim(),
-    description: (row.description || row.Description || row['Описание'] || '').trim(),
-    price: (row.price || row.Price || row['Цена'] || '').trim(),
-    visible: (row.visible || row.Visible || row['Показать'] || 'yes').trim().toLowerCase()
-  };
+function getSheetCsvUrl(sourceUrl) {
+  const url = String(sourceUrl || '').trim();
+  if (!url) return '';
+  if (url.includes('output=csv') || url.includes('tqx=out:csv')) return url;
+
+  const idMatch = url.match(/\/spreadsheets\/d\/([a-zA-Z0-9-_]+)/);
+  const gidMatch = url.match(/[?#&]gid=(\d+)/);
+  if (!idMatch) return url;
+
+  const sheetId = idMatch[1];
+  const gid = gidMatch ? gidMatch[1] : '0';
+  return `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:csv&gid=${gid}`;
 }
 
 function parseCSV(text) {
   const rows = [];
-  let row = [], field = '', inQuotes = false;
+  let row = [];
+  let field = '';
+  let inQuotes = false;
+
   for (let i = 0; i < text.length; i++) {
-    const char = text[i], next = text[i + 1];
+    const char = text[i];
+    const next = text[i + 1];
+
     if (char === '"' && inQuotes && next === '"') { field += '"'; i++; continue; }
     if (char === '"') { inQuotes = !inQuotes; continue; }
     if (char === ',' && !inQuotes) { row.push(field); field = ''; continue; }
-    if ((char === '
-' || char === '') && !inQuotes) {
-      if (char === '' && next === '
-') i++;
-      row.push(field); field = '';
-      if (row.some(cell => cell.trim() !== '')) rows.push(row);
+    if ((char === '\n' || char === '\r') && !inQuotes) {
+      if (char === '\r' && next === '\n') i++;
+      row.push(field);
+      if (row.some(cell => String(cell).trim() !== '')) rows.push(row);
       row = [];
+      field = '';
       continue;
     }
     field += char;
   }
+
   row.push(field);
-  if (row.some(cell => cell.trim() !== '')) rows.push(row);
+  if (row.some(cell => String(cell).trim() !== '')) rows.push(row);
   if (!rows.length) return [];
-  const headers = rows.shift().map(h => h.trim());
+
+  const headers = rows.shift().map(h => String(h).trim().toLowerCase());
   return rows.map(values => Object.fromEntries(headers.map((h, i) => [h, values[i] || ''])));
 }
 
-async function loadServices() {
-  const status = document.getElementById('servicesStatus');
-  if (!SHEET_CSV_URL) {
-    status.textContent = 'Показан е вграден примерен прайс. Сложи Google Sheets CSV линк в script.js → SHEET_CSV_URL.';
-    return FALLBACK_SERVICES;
-  }
+function normalizeRow(row) {
+  return {
+    category: (row.category || row['категория'] || row['раздел'] || '').trim(),
+    subcategory: (row.subcategory || row['sub category'] || row['подкатегория'] || row['подраздел'] || '').trim(),
+    name: (row.name || row.service || row['услуга'] || row['название'] || '').trim(),
+    description: (row.description || row['описание'] || '').trim(),
+    price: (row.price || row['цена'] || row['price (€)'] || '').trim(),
+    visible: (row.visible || row['показать'] || 'yes').trim().toLowerCase()
+  };
+}
 
-  try {
-    const response = await fetch(SHEET_CSV_URL + (SHEET_CSV_URL.includes('?') ? '&' : '?') + 'cache=' + Date.now());
-    if (!response.ok) throw new Error('Sheet request failed');
-    const csvText = await response.text();
-    const rows = parseCSV(csvText).map(normalizeRow)
-      .filter(item => item.name && item.visible !== 'no' && item.visible !== '0' && item.visible !== 'false');
-    if (!rows.length) throw new Error('No services found');
-    status.classList.add('is-hidden');
-    return rows;
-  } catch (error) {
-    console.warn('Google Sheet could not be loaded. Fallback prices are used.', error);
-    status.textContent = 'Не удалось загрузить Google Sheet. Показан резервный прайс-лист.';
-    return FALLBACK_SERVICES;
-  }
+function isVisible(item) {
+  return !['no', '0', 'false', 'hide', 'hidden', 'нет'].includes(String(item.visible || '').toLowerCase());
+}
+
+function formatPrice(price) {
+  const raw = String(price || '').trim();
+  if (!raw) return '';
+  if (/€|eur|евро/i.test(raw)) return raw.replace(/eur/ig, '€');
+  if (raw.startsWith('+')) return '+€' + raw.slice(1).trim();
+  return '€' + raw;
 }
 
 function escapeHTML(value) {
@@ -632,53 +724,112 @@ function escapeHTML(value) {
   }[char]));
 }
 
+function slugify(value) {
+  return String(value || 'services')
+    .toLowerCase()
+    .replace(/[^a-z0-9а-яё]+/gi, '-')
+    .replace(/^-+|-+$/g, '') || 'services';
+}
+
+async function loadServices() {
+  const status = document.getElementById('servicesStatus');
+  const csvUrl = getSheetCsvUrl(SHEET_SOURCE_URL);
+
+  try {
+    if (!csvUrl) throw new Error('Missing Google Sheet URL');
+    const response = await fetch(csvUrl + (csvUrl.includes('?') ? '&' : '?') + 'cache=' + Date.now());
+    if (!response.ok) throw new Error('Google Sheet request failed');
+
+    const csvText = await response.text();
+    const rows = parseCSV(csvText)
+      .map(normalizeRow)
+      .filter(item => item.category && item.name && isVisible(item));
+
+    if (!rows.length) throw new Error('No valid rows found in Google Sheet');
+    if (status) status.classList.add('is-hidden');
+    return rows;
+  } catch (error) {
+    console.warn('Using fallback services. Google Sheet could not be loaded:', error);
+    if (status) status.textContent = 'Google Sheet не се зареди. Показан е резервният прайс от сайта.';
+    return FALLBACK_SERVICES.map(normalizeRow).filter(item => item.category && item.name && isVisible(item));
+  }
+}
+
+function groupByCategory(items) {
+  const categories = [];
+  const categoryMap = new Map();
+
+  items.forEach(item => {
+    const category = item.category || 'Услуги';
+    if (!categoryMap.has(category)) {
+      const group = { name: category, slug: slugify(category), items: [] };
+      categoryMap.set(category, group);
+      categories.push(group);
+    }
+    categoryMap.get(category).items.push(item);
+  });
+
+  return categories;
+}
+
+function groupBySubcategory(items) {
+  const subgroups = [];
+  const subMap = new Map();
+
+  items.forEach(item => {
+    const subcategory = item.subcategory || 'Основные услуги';
+    if (!subMap.has(subcategory)) {
+      const group = { name: subcategory, items: [] };
+      subMap.set(subcategory, group);
+      subgroups.push(group);
+    }
+    subMap.get(subcategory).items.push(item);
+  });
+
+  return subgroups;
+}
+
 function renderServices(items) {
   const tabsEl = document.getElementById('servicesTabs');
   const contentEl = document.getElementById('servicesContent');
-  const groups = [];
-  const seen = new Set();
+  if (!tabsEl || !contentEl) return;
 
-  items.forEach(item => {
-    const tab = item.tab || 'services';
-    if (!seen.has(tab)) {
-      seen.add(tab);
-      groups.push({ tab, label: item.tabLabel || tab, items: [] });
-    }
-    groups.find(group => group.tab === tab).items.push(item);
-  });
+  const categories = groupByCategory(items);
 
-  tabsEl.innerHTML = groups.map((group, index) => `
-    <button class="tab-btn ${index === 0 ? 'active' : ''}" data-tab="${escapeHTML(group.tab)}">
-      ${escapeHTML(group.label)}
+  tabsEl.innerHTML = categories.map((category, index) => `
+    <button class="tab-btn ${index === 0 ? 'active' : ''}" data-tab="${escapeHTML(category.slug)}">
+      ${escapeHTML(category.name)}
     </button>
   `).join('');
 
-  contentEl.innerHTML = groups.map((group, index) => `
-    <div class="tab-panel generated ${index === 0 ? 'active' : ''}" id="tab-${escapeHTML(group.tab)}">
-      <div class="price-grid">
-        ${group.items.map(item => `
-          <div class="price-card">
-            ${item.category ? `<div class="pc-cat">${escapeHTML(item.category)}</div>` : ''}
-            <div class="pc-name">${escapeHTML(item.name)}</div>
-            ${item.description ? `<div class="pc-desc">${escapeHTML(item.description)}</div>` : ''}
-            <div class="pc-price">${escapeHTML(item.price)}</div>
+  contentEl.innerHTML = categories.map((category, index) => `
+    <div class="tab-panel generated ${index === 0 ? 'active' : ''}" id="tab-${escapeHTML(category.slug)}">
+      ${groupBySubcategory(category.items).map(subgroup => `
+        <div class="subcategory-block">
+          <h3 class="subcategory-title">${escapeHTML(subgroup.name)}</h3>
+          <div class="price-grid">
+            ${subgroup.items.map(item => `
+              <article class="price-card">
+                <div class="pc-name">${escapeHTML(item.name)}</div>
+                ${item.description ? `<div class="pc-desc">${escapeHTML(item.description)}</div>` : ''}
+                <div class="pc-price">${escapeHTML(formatPrice(item.price))}</div>
+              </article>
+            `).join('')}
           </div>
-        `).join('')}
-      </div>
+        </div>
+      `).join('')}
     </div>
   `).join('');
 
   tabsEl.querySelectorAll('.tab-btn').forEach(button => {
-    button.addEventListener('click', () => showTab(button.dataset.tab, button));
+    button.addEventListener('click', () => {
+      document.querySelectorAll('.tab-panel.generated').forEach(panel => panel.classList.remove('active'));
+      document.querySelectorAll('.tab-btn').forEach(tab => tab.classList.remove('active'));
+      const panel = document.getElementById('tab-' + button.dataset.tab);
+      if (panel) panel.classList.add('active');
+      button.classList.add('active');
+    });
   });
-}
-
-function showTab(id, btn) {
-  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-  const panel = document.getElementById('tab-' + id);
-  if (panel) panel.classList.add('active');
-  if (btn) btn.classList.add('active');
 }
 
 loadServices().then(renderServices);

@@ -467,3 +467,19 @@ footer a:hover { color:var(--rose); }
 @media (max-width:900px) {
   .price-card[style] { grid-column:auto !important; }
 }
+
+/* ─── SUBCATEGORY PRICE GROUPS ─── */
+.subcategory-block { margin-bottom:2.2rem; }
+.subcategory-block:last-child { margin-bottom:0; }
+.subcategory-title {
+  font-family:'Cormorant Garamond',serif;
+  font-size:1.55rem;
+  font-style:italic;
+  font-weight:600;
+  color:var(--deep);
+  margin:0 0 1rem;
+  padding-left:1rem;
+  border-left:3px solid var(--rose);
+}
+.generated .price-grid { margin-bottom:0; }
+.generated .pc-price::after { content:''; }
