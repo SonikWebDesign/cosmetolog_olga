@@ -483,3 +483,85 @@ footer a:hover { color:var(--rose); }
 }
 .generated .price-grid { margin-bottom:0; }
 .generated .pc-price::after { content:''; }
+
+
+/* ─── MOBILE NAV + MOBILE HERO FIXES ─── */
+.mobile-menu-btn {
+  display:none;
+  width:44px;
+  height:44px;
+  border:1px solid var(--border);
+  background:rgba(250,250,247,0.92);
+  cursor:pointer;
+  align-items:center;
+  justify-content:center;
+  flex-direction:column;
+  gap:5px;
+  z-index:120;
+}
+.mobile-menu-btn span {
+  width:19px;
+  height:1.5px;
+  background:var(--deep);
+  transition:transform 0.25s ease, opacity 0.25s ease;
+}
+nav.mobile-open .mobile-menu-btn span:nth-child(1) { transform:translateY(6.5px) rotate(45deg); }
+nav.mobile-open .mobile-menu-btn span:nth-child(2) { opacity:0; }
+nav.mobile-open .mobile-menu-btn span:nth-child(3) { transform:translateY(-6.5px) rotate(-45deg); }
+
+.about.about-no-photo {
+  grid-template-columns:minmax(0, 760px);
+  justify-content:center;
+  gap:0;
+}
+.about.about-no-photo .about-text { max-width:760px; }
+
+@media (max-width:900px) {
+  .mobile-menu-btn { display:flex; }
+
+  nav { gap:1rem; }
+  .nav-brand { max-width:calc(100% - 60px); }
+  .nav-links {
+    position:absolute;
+    top:100%;
+    left:1rem;
+    right:1rem;
+    display:flex;
+    flex-direction:column;
+    gap:0;
+    padding:0.7rem;
+    background:rgba(250,250,247,0.98);
+    border:1px solid var(--border);
+    box-shadow:0 18px 50px rgba(42,35,32,0.12);
+    transform:translateY(-8px);
+    opacity:0;
+    visibility:hidden;
+    pointer-events:none;
+    transition:opacity 0.25s ease, transform 0.25s ease, visibility 0.25s ease;
+  }
+  nav.mobile-open .nav-links {
+    opacity:1;
+    visibility:visible;
+    pointer-events:auto;
+    transform:translateY(0);
+  }
+  .nav-links a {
+    display:block;
+    padding:1rem 0.9rem;
+    border-bottom:1px solid var(--border);
+    color:var(--deep);
+  }
+  .nav-links li:last-child a { border-bottom:0; }
+
+  .hero-right {
+    height:92vw;
+    min-height:380px;
+    max-height:560px;
+    order:-1;
+  }
+  .hero-photo { object-position:center top; }
+  .hero-photo-overlay {
+    background:linear-gradient(to top, var(--ivory) 0%, transparent 26%);
+  }
+  .about.about-no-photo { padding-top:4.5rem; }
+}

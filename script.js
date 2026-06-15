@@ -833,3 +833,31 @@ function renderServices(items) {
 }
 
 loadServices().then(renderServices);
+
+
+// ===============================
+// MOBILE NAVIGATION
+// ===============================
+const mainNav = document.getElementById('mainNav');
+const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
+
+if (mainNav && mobileMenuBtn) {
+  mobileMenuBtn.addEventListener('click', () => {
+    const isOpen = mainNav.classList.toggle('mobile-open');
+    mobileMenuBtn.setAttribute('aria-expanded', String(isOpen));
+  });
+
+  mainNav.querySelectorAll('.nav-links a').forEach(link => {
+    link.addEventListener('click', () => {
+      mainNav.classList.remove('mobile-open');
+      mobileMenuBtn.setAttribute('aria-expanded', 'false');
+    });
+  });
+
+  document.addEventListener('click', (event) => {
+    if (!mainNav.contains(event.target)) {
+      mainNav.classList.remove('mobile-open');
+      mobileMenuBtn.setAttribute('aria-expanded', 'false');
+    }
+  });
+}
