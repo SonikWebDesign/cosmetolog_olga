@@ -4,7 +4,7 @@
 // Sheet columns: category | subcategory | name | description | price
 // Client can safely edit only the `price` column.
 
-const SHEET_SOURCE_URL = "https://docs.google.com/spreadsheets/d/1oMszuFqlkky34DVsuRTQlfHncM7Qztrky6A-GbBuQGI/edit?gid=0#gid=0";
+const SHEET_SOURCE_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRYcJp-GygxTWb13WtO0zLe0z03hvSk2KLaRJCenMdMZL0I-M8ByU-DwGqQMP-A4iNvvBJCd8sgo8Qk/pub?output=csv";
 
 const FALLBACK_SERVICES = [
   {
